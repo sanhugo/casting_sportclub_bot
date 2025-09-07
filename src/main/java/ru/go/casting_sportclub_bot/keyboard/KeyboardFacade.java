@@ -1,0 +1,30 @@
+package ru.go.casting_sportclub_bot.keyboard;
+
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+
+import java.util.List;
+
+@Component
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class KeyboardFacade {
+    ReplyKeyboardMaker keyboardMaker;
+    InlineKeyboardMaker inlineKeyboardMaker;
+    public KeyboardFacade(ReplyKeyboardMaker keyboardMarkup, InlineKeyboardMaker inlineKeyboardMaker) {
+        this.keyboardMaker = keyboardMarkup;
+        this.inlineKeyboardMaker = inlineKeyboardMaker;
+    }
+
+    public ReplyKeyboardMarkup menuKeyboard() {
+        return keyboardMaker.menuKeyboard();
+    }
+    public InlineKeyboardMarkup exerciseKeyboard() {
+        return inlineKeyboardMaker.getExercises();
+    }
+
+
+}

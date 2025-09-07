@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: casting_sportclub_bot
+  datasource:
+    url: jdbc:postgresql://localhost:5432/SSCBot
+    username: pguser
+    password: hugo4POS123
+  jpa:
+    hibernate:
+      ddl-auto: create
+    open-in-view: false
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
