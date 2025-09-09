@@ -30,6 +30,6 @@ public class CastingBot extends SpringWebhookBot {
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-            return telegramFacade.handleUpdate(update);
+            return telegramFacade.handleUpdate(update,this);
     }
 }

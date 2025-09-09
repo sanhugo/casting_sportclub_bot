@@ -19,7 +19,7 @@ public class UserCard {
     @Column(nullable = false)
     private String phone;
     @Column(nullable = false)
-    private LocalDate birthDate;
+    private Integer age;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
@@ -31,4 +31,8 @@ public class UserCard {
     @Enumerated(EnumType.STRING)
     @Column(name = "choice")
     private HashSet<Choice> choices;
+    @Column(nullable = false)
+    private String eventmaking;
+    @Column(nullable = false)
+    private String eventpart;
 }

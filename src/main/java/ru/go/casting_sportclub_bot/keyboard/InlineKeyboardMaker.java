@@ -7,12 +7,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import ru.go.casting_sportclub_bot.model.Choice;
 import ru.go.casting_sportclub_bot.model.Faculties;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -58,5 +56,29 @@ public class InlineKeyboardMaker {
             buttons.add(row);
         }
         return buttons;
+    }
+
+    public InlineKeyboardMarkup directions(Set<Choice> selected) {
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        Choice[] c = Choice.values();
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+        for (Choice choice:c)
+        {
+            List<InlineKeyboardButton> row = new ArrayList<>();
+            InlineKeyboardButton ikb = new InlineKeyboardButton();
+            String text = selected.contains(choice) ? "✅ " + choice.getValue() : choice.getValue();
+            ikb.setText(text);
+            ikb.setCallbackData(choice.name());
+
+            row.add(ikb);
+            keyboard.add(row);
+        }
+        InlineKeyboardButton done = new InlineKeyboardButton("Готово!");
+        done.setCallbackData("Done");
+        List<InlineKeyboardButton> row = new ArrayList<>();
+        row.add(done);
+        keyboard.add(row);
+        markup.setKeyboard(keyboard);
+        return markup;
     }
 }

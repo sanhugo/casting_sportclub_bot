@@ -17,9 +17,10 @@ public class UserCardRedis {
     private Long tgid;
     private Faculties faculty;
     private String phone;
-    private LocalDate birthDate;
+    private Integer age;
     private String name;
     private String surname;
     private String course;
-    private Set<Choice> choices = new HashSet<>();
+    private String eventmaking;
+    private String eventpart;
 }

@@ -1,5 +1,8 @@
 package ru.go.casting_sportclub_bot.model;
 
+import lombok.Getter;
+
+@Getter
 public enum Choice {
     CYBER("Киберспорт"),
     MEDIA("Медиаменеджмент"),
