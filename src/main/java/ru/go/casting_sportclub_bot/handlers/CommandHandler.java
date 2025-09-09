@@ -24,14 +24,18 @@ public class CommandHandler implements Handler{
 
     @Override
     public BotApiMethod<?> handle(Update update) {
+        System.out.println("GOT MESSAGE!");
         String command = update.getMessage().getText().trim();
         SendMessage s = new SendMessage();
         long userID = update.getMessage().getChatId();
+        s.setChatId(userID);
         if (command.equals("/start"))
         {
+            System.out.println("I GOT THIS!");
             if (!uss.hasUser(userID))
             {
                 s.setText("Добро пожаловать в бот регистрации на кастинг в ССК «Сибры». Готовы познакомиться?\nДля начала разрешите передать свой контакт для связи руководителей с Вами. Без контактной информации мы не сможем связаться с Вами.");
+                s.setReplyMarkup(kf.askContact());
                 uss.newState(userID, BotStatus.CONTACT);
             }
             else

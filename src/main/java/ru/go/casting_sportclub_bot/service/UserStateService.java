@@ -6,6 +6,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import ru.go.casting_sportclub_bot.model.BotStatus;
 import ru.go.casting_sportclub_bot.model.Faculties;
+import ru.go.casting_sportclub_bot.model.UserState;
 import ru.go.casting_sportclub_bot.repository.UserStateRepository;
 
 @Service
@@ -20,7 +21,18 @@ public class UserStateService {
     }
     public void newState(Long id, BotStatus botStatus)
     {
-
+        String key = "State:"+id;
+        if (redisTemplate.hasKey(key))
+        {
+            UserState us = new UserState();
+            us.setId(id);
+            us.setStatus(botStatus);
+            userStateRepository.save(us);
+        }
+        else
+        {
+            redisTemplate.opsForHash().put(key,"status",botStatus.name());
+        }
     }
 
     public boolean hasUser(Long id) {
@@ -29,7 +41,11 @@ public class UserStateService {
     }
     public BotStatus checkStatus(long id)
     {
-        return (BotStatus)(redisTemplate.opsForHash().get("State:"+id,"status"));
+        Object o = redisTemplate.opsForHash().get("State:"+id,"status");
+        if (o!=null)
+            return BotStatus.valueOf(redisTemplate.opsForHash().get("State:"+id,"status").toString());
+        else
+            return BotStatus.CONTACT;
     }
 
     public void addProperty(long userID, String field, String f) {

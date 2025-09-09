@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.go.casting_sportclub_bot.bot.CastingBot;
 import ru.go.casting_sportclub_bot.service.UserFacade;
@@ -16,7 +15,7 @@ public class TelegramFacade {
     MessageHandler messageHandler;
     CommandHandler commandHandler;
 
-    public TelegramFacade(CallbackHandler callbackHandler, MessageHandler messageHandler, CommandHandler commandHandler, UserFacade userFacade) {
+    public TelegramFacade(CallbackHandler callbackHandler, MessageHandler messageHandler, CommandHandler commandHandler) {
         this.callbackHandler = callbackHandler;
         this.messageHandler = messageHandler;
         this.commandHandler = commandHandler;
@@ -29,12 +28,12 @@ public class TelegramFacade {
         }
         else
         {
-            String str = update.getMessage().getText().trim();
-            if (str.startsWith("/"))
+            System.out.println("HERE!");
+            if (update.hasMessage() && update.getMessage().hasText()&& update.getMessage().getText().startsWith("/"))
             {
                 return commandHandler.handle(update);
             }
-            else return messageHandler.handle(update);
+            return messageHandler.handle(update);
         }
     }
 }

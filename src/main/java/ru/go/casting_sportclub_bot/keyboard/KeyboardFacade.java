@@ -33,4 +33,8 @@ public class KeyboardFacade {
     public InlineKeyboardMarkup directions(Set<Choice> set) {
         return inlineKeyboardMaker.directions(set);
     }
+    public ReplyKeyboardMarkup menuButton()
+    {
+        return keyboardMaker.menuButton();
+    }
 }

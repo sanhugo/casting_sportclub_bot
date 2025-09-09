@@ -5,6 +5,7 @@ public enum BotStatus {
     CONTACT,
     NAME,
     SURNAME,
+    COURSE,
     AGE,
     FACULTY,
     CHOICES,

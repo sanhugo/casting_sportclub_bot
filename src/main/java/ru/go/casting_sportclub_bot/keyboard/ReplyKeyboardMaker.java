@@ -21,16 +21,18 @@ public class ReplyKeyboardMaker {
         replyKeyboardMarkup.setOneTimeKeyboard(true);
         List<KeyboardRow> rows = new ArrayList<>();
         KeyboardRow keyboardRow1 = new KeyboardRow();
-        KeyboardButton button = new KeyboardButton("")
-
-
         KeyboardButton kb = new KeyboardButton("FAQ");
         KeyboardButton kb1 = new KeyboardButton("Задать свой вопрос");
         keyboardRow1.add(kb);
         keyboardRow1.add(kb1);
+        KeyboardRow kr1 = new KeyboardRow();
+        KeyboardButton directions = new KeyboardButton("Отделы");
+        KeyboardButton castingDate = new KeyboardButton("О кастинге");
+        kr1.add(directions);
+        kr1.add(castingDate);
         rows.add(keyboardRow1);
+        rows.add(kr1);
         replyKeyboardMarkup.setKeyboard(rows);
-
         return replyKeyboardMarkup;
     }
 
@@ -38,14 +40,20 @@ public class ReplyKeyboardMaker {
         // Создаём кнопку
         KeyboardButton contactButton = new KeyboardButton("Отправить контакт");
         contactButton.setRequestContact(true); // ✅ запросит контакт
-
         // Размещаем кнопку в клавиатуре
-        KeyboardRow row = new KeyboardRow();
-        row.add(contactButton);
+        return creakeKeyboard(contactButton);
+    }
 
+    public ReplyKeyboardMarkup menuButton() {
+        KeyboardButton menu = new KeyboardButton("Главное меню");
+        return creakeKeyboard(menu);
+    }
+
+    private ReplyKeyboardMarkup creakeKeyboard(KeyboardButton menu) {
+        KeyboardRow row = new KeyboardRow();
+        row.add(menu);
         List<KeyboardRow> keyboard = new ArrayList<>();
         keyboard.add(row);
-
         ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
         markup.setKeyboard(keyboard);
         markup.setResizeKeyboard(true);

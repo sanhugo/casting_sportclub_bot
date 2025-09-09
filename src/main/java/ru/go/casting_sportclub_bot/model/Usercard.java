@@ -6,15 +6,17 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-public class UserCard {
+public class Usercard {
     @Id
     @Column(nullable = false)
     private Long tgid;
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Faculties faculty;
     @Column(nullable = false)
     private String phone;
@@ -30,7 +32,7 @@ public class UserCard {
     @CollectionTable(name = "user_choices", joinColumns = @JoinColumn(name = "tgid"))
     @Enumerated(EnumType.STRING)
     @Column(name = "choice")
-    private HashSet<Choice> choices;
+    private Set<Choice> choices;
     @Column(nullable = false)
     private String eventmaking;
     @Column(nullable = false)

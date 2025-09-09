@@ -31,6 +31,10 @@ public class MessageHandler implements Handler{
     @Override
     public BotApiMethod<?> handle(Update update) {
         SendMessage s = new SendMessage();
+        if (update.getMessage()==null)
+        {
+            System.out.println(update);
+        }
         long userID=update.getMessage().getChatId();
         s.setChatId(userID);
         switch (usr.checkStatus(userID))
@@ -51,6 +55,12 @@ public class MessageHandler implements Handler{
             case SURNAME:
                 String surname = update.getMessage().getText().trim();
                 usr.addProperty(userID,"surname",surname);
+                usr.newState(userID,BotStatus.COURSE);
+                s.setText("На каком курсе Вы учитесь?");
+                break;
+            case COURSE:
+                String course = update.getMessage().getText().trim();
+                usr.addProperty(userID,"course",course);
                 usr.newState(userID,BotStatus.AGE);
                 s.setText("Сколько Вам лет?");
                 break;
@@ -62,11 +72,16 @@ public class MessageHandler implements Handler{
                     usr.newState(userID,BotStatus.FACULTY);
                     s.setText("Выберите факультет");
                     s.setReplyMarkup(kf.facultiesKeyboard());
-                    break;
                 }
                 else{
-                    s.setText("Неверно введена дата. Попробуйте еще раз");
+                    s.setText("Неверно введен возраст. Попробуйте еще раз");
                 }
+                break;
+            case FACULTY:
+                s.setText("Выберите свое подразделение.");
+            case CHOICES:
+                s.setText("Выберите, пожалуйста, все опции и нажмите Готово.");
+                break;
             case EVENTMAKING:
                 String skills_event = update.getMessage().getText().trim();
                 if (skills_event.isBlank()) {
@@ -90,8 +105,35 @@ public class MessageHandler implements Handler{
                     usr.addProperty(userID,"eventpart",participation);
                     usr.newState(userID,BotStatus.READY);
                     ucs.saveUserCard(userID);
+                    s.setText("Вы зарегистрированы на кастинг!\nГлавное меню");
+                    s.setReplyMarkup(kf.menuKeyboard());
                 }
                 break;
+            case READY:
+                String com = update.getMessage().getText().trim();
+                switch (com)
+                {
+                    case "Главное меню":
+                        s.setReplyMarkup(kf.menuKeyboard());
+                        s.setText("Вы находитесь на главном меню.");
+                        break;
+                    case "FAQ":
+                        s.setReplyMarkup(kf.menuButton());
+                        s.setText("В данном разделе приведены часто задаваемые вопросы. ОБЯЗАТЕЛЬНО прочтите, прежде чем задать свой вопрос.");
+                        break;
+                    case "Отделы":
+                        s.setText("Данный раздел находится на доработке");
+                        s.setReplyMarkup(kf.menuButton());
+                        break;
+                    case "О кастинге":
+                        s.setText("Данный раздел находится на доработке. Ожидайте информацию");
+                        s.setReplyMarkup(kf.menuButton());
+                        break;
+                    case "Задать свой вопрос":
+                        s.setText("Подписался на спортклуб?");
+                        s.setReplyMarkup(kf.menuButton());
+                        break;
+                }
         }
         return s;
     }

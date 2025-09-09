@@ -42,7 +42,6 @@ public class CallbackHandler {
         switch (bt) {
             case FACULTY:
                 String f = update.getCallbackQuery().getData();
-
                 DeleteMessage dm = new DeleteMessage();
                 dm.setChatId(userID);
                 dm.setMessageId(messageId);
@@ -64,7 +63,6 @@ public class CallbackHandler {
 
             case CHOICES:
                 String callbackData = update.getCallbackQuery().getData();
-
                 if (callbackData.equals("Done")) {
                     // Получаем выбранные направления из Redis
                     Set<Choice> selections = ds.getSelections(userID);
@@ -75,7 +73,7 @@ public class CallbackHandler {
                     edit.setMessageId(messageId);
                     edit.setText("Опишите свой опыт организации мероприятий.");
                     edit.setReplyMarkup(null);
-
+                    ust.newState(userID,BotStatus.EVENTMAKING);
                     return edit;
 
                 } else {

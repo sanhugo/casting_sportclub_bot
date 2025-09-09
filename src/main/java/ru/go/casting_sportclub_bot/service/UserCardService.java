@@ -5,9 +5,15 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import ru.go.casting_sportclub_bot.model.UserCard;
+import ru.go.casting_sportclub_bot.model.BotStatus;
+import ru.go.casting_sportclub_bot.model.Choice;
+import ru.go.casting_sportclub_bot.model.Faculties;
+import ru.go.casting_sportclub_bot.model.Usercard;
 import ru.go.casting_sportclub_bot.repository.UserCardRedisRepository;
 import ru.go.casting_sportclub_bot.repository.UserCardRepository;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
@@ -26,17 +32,28 @@ public class UserCardService {
     }
 
     @Async
-    public void saveUserCard(long id)
-    {
-        String key = "UserCard:"+id;
-        UserCard u = new UserCard();
+    public void saveUserCard(long id)    {
+        String key = "UserCards:"+id;
+        String key2 = "UserSelections:"+id;
+        Usercard u = new Usercard();
         u.setTgid(id);
         u.setPhone((String) redisTemplate.opsForHash().get(key,"phone"));
         u.setName((String) redisTemplate.opsForHash().get(key,"name"));
         u.setSurname((String) redisTemplate.opsForHash().get(key,"surname"));
-        u.setAge(Integer.parseInt(redisTemplate.opsForHash().get(key,"age").toString()));
-
-        
+        u.setAge(Integer.valueOf((String) redisTemplate.opsForHash().get(key,"age")));
+        u.setFaculty(Faculties.valueOf((String) redisTemplate.opsForHash().get(key,"faculties")));
+        u.setEventmaking((String) redisTemplate.opsForHash().get(key,"eventmaking"));
+        u.setEventpart((String) redisTemplate.opsForHash().get(key,"eventpart"));
+        u.setCourse((String) redisTemplate.opsForHash().get(key,"course"));
+        Set<Object> set = redisTemplate.opsForSet().members(key2);
+        Set<Choice> c = new HashSet<>();
+        for (Object o:set)
+        {
+            c.add(Choice.valueOf(o.toString()));
+        }
+        u.setChoices(c);
         userCardRepository.save(u);
+        redisTemplate.delete(key);
+        redisTemplate.delete(key2);
     }
 }
