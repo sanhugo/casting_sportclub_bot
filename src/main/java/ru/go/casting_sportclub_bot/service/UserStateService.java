@@ -5,38 +5,24 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import ru.go.casting_sportclub_bot.model.BotStatus;
-import ru.go.casting_sportclub_bot.model.Faculties;
-import ru.go.casting_sportclub_bot.model.UserState;
-import ru.go.casting_sportclub_bot.repository.UserStateRepository;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 public class UserStateService {
-    UserStateRepository userStateRepository;
     RedisTemplate<String,Object> redisTemplate;
 
-    public UserStateService(UserStateRepository userStateRepository, RedisTemplate<String, Object> redisTemplate) {
-        this.userStateRepository = userStateRepository;
+    public UserStateService(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
     public void newState(Long id, BotStatus botStatus)
     {
         String key = "State:"+id;
-        if (redisTemplate.hasKey(key))
-        {
-            UserState us = new UserState();
-            us.setId(id);
-            us.setStatus(botStatus);
-            userStateRepository.save(us);
-        }
-        else
-        {
-            redisTemplate.opsForHash().put(key,"status",botStatus.name());
-        }
+        redisTemplate.opsForHash().put(key,"status",botStatus.name());
     }
 
     public boolean hasUser(Long id) {
         String key = "State:"+id;
+        System.out.println(redisTemplate.opsForHash().entries(key));
         return redisTemplate.hasKey(key);
     }
     public BotStatus checkStatus(long id)

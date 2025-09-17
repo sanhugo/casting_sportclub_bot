@@ -37,4 +37,7 @@ public class Usercard {
     private String eventmaking;
     @Column(nullable = false)
     private String eventpart;
+    @Column(nullable = false)
+    @Temporal(TemporalType.DATE)
+    private LocalDate regdate;
 }

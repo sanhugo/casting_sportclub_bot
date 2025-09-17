@@ -30,21 +30,37 @@ public class MessageHandler implements Handler{
 
     @Override
     public BotApiMethod<?> handle(Update update) {
+        if (update.hasMessage()){
         SendMessage s = new SendMessage();
-        if (update.getMessage()==null)
-        {
-            System.out.println(update);
-        }
         long userID=update.getMessage().getChatId();
         s.setChatId(userID);
         switch (usr.checkStatus(userID))
         {
             case CONTACT:
                 Contact contact = update.getMessage().getContact();
+                if (contact!=null){
                 String phone = contact.getPhoneNumber();
                 usr.addProperty(userID,"phone",phone);
                 usr.newState(userID, BotStatus.NAME);
-                s.setText("Введите имя");
+                s.setText("Введите имя");}
+                else if (update.getMessage().hasText())
+                {
+                    String phone = update.getMessage().getText();
+                    if (rc.isPhone(phone))
+                    {
+                        usr.addProperty(userID,"phone",phone);
+                        usr.newState(userID, BotStatus.NAME);
+                        s.setText("Введите имя");
+                    }
+                    else
+                    {
+                        s.setText("Номер не прочитался. Пожалуйста, введите вручную номер в формате 7XXXXXXXXXX.");
+                    }
+                }
+                else
+                {
+                    s.setText("Номер не прочитался. Пожалуйста, введите вручную номер в формате 7XXXXXXXXXX.");
+                }
                 break;
             case NAME:
                 String name = update.getMessage().getText().trim();
@@ -136,5 +152,7 @@ public class MessageHandler implements Handler{
                 }
         }
         return s;
+        }
+        return null;
     }
 }

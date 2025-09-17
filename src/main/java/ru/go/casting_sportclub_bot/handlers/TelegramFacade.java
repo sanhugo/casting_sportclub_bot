@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.go.casting_sportclub_bot.bot.CastingBot;
-import ru.go.casting_sportclub_bot.service.UserFacade;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -28,8 +27,7 @@ public class TelegramFacade {
         }
         else
         {
-            System.out.println("HERE!");
-            if (update.hasMessage() && update.getMessage().hasText()&& update.getMessage().getText().startsWith("/"))
+            if (update.hasMessage()&&update.getMessage().hasText()&&update.getMessage().getText().startsWith("/"))
             {
                 return commandHandler.handle(update);
             }

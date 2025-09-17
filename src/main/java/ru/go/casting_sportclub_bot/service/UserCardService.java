@@ -5,13 +5,12 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import ru.go.casting_sportclub_bot.model.BotStatus;
 import ru.go.casting_sportclub_bot.model.Choice;
 import ru.go.casting_sportclub_bot.model.Faculties;
 import ru.go.casting_sportclub_bot.model.Usercard;
-import ru.go.casting_sportclub_bot.repository.UserCardRedisRepository;
 import ru.go.casting_sportclub_bot.repository.UserCardRepository;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -52,6 +51,7 @@ public class UserCardService {
             c.add(Choice.valueOf(o.toString()));
         }
         u.setChoices(c);
+        u.setRegdate(LocalDate.now());
         userCardRepository.save(u);
         redisTemplate.delete(key);
         redisTemplate.delete(key2);

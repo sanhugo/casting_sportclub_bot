@@ -1,5 +1,6 @@
 package ru.go.casting_sportclub_bot.config;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -9,7 +10,6 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
-@EnableRedisRepositories(basePackages = "ru.go.casting_sportclub_bot.repository")
 public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
