@@ -60,4 +60,22 @@ public class ReplyKeyboardMaker {
         markup.setOneTimeKeyboard(true);
         return markup;
     }
+
+    public ReplyKeyboardMarkup adminKeyboard() {
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        keyboard.add(buttonRow("Посмотреть регистрации"));
+        keyboard.add(buttonRow("Регистрации по отделам"));
+        keyboard.add(buttonRow("Выгрузить файл"));
+        replyKeyboardMarkup.setKeyboard(keyboard);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+        return replyKeyboardMarkup;
+    }
+    public KeyboardRow buttonRow(String name)
+    {
+        KeyboardRow keyboardRow = new KeyboardRow();
+        keyboardRow.add(new KeyboardButton(name));
+        return keyboardRow;
+    }
 }

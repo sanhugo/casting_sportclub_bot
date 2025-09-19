@@ -5,7 +5,10 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.go.casting_sportclub_bot.bot.CastingBot;
+
+import java.io.IOException;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -20,7 +23,7 @@ public class TelegramFacade {
         this.commandHandler = commandHandler;
     }
 
-    public BotApiMethod<?> handleUpdate(Update update, CastingBot bot) {
+    public BotApiMethod<?> handleUpdate(Update update, CastingBot bot) throws TelegramApiException, IOException {
         if (update.hasCallbackQuery())
         {
             return callbackHandler.handle(update,bot);
@@ -31,7 +34,7 @@ public class TelegramFacade {
             {
                 return commandHandler.handle(update);
             }
-            return messageHandler.handle(update);
+            return messageHandler.handle(update,bot);
         }
     }
 }

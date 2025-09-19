@@ -38,6 +38,5 @@ public class Usercard {
     @Column(nullable = false)
     private String eventpart;
     @Column(nullable = false)
-    @Temporal(TemporalType.DATE)
     private LocalDate regdate;
 }

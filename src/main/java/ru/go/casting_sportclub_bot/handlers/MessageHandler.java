@@ -4,52 +4,98 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
 import org.telegram.telegrambots.meta.api.objects.Contact;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.go.casting_sportclub_bot.bot.CastingBot;
+import ru.go.casting_sportclub_bot.documents.FormDoc;
 import ru.go.casting_sportclub_bot.keyboard.KeyboardFacade;
 import ru.go.casting_sportclub_bot.model.BotStatus;
+import ru.go.casting_sportclub_bot.model.Choice;
 import ru.go.casting_sportclub_bot.regex.RegexChecker;
 import ru.go.casting_sportclub_bot.service.UserCardService;
+import ru.go.casting_sportclub_bot.service.UserFacade;
 import ru.go.casting_sportclub_bot.service.UserStateService;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.FormatFlagsConversionMismatchException;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MessageHandler implements Handler{
-    UserStateService usr;
+    UserFacade uf;
     KeyboardFacade kf;
-    UserCardService ucs;
     RegexChecker rc;
+    FormDoc fd;
 
-    public MessageHandler(UserStateService usr, KeyboardFacade kf, UserCardService ucs, RegexChecker rc) {
-        this.usr = usr;
+    public MessageHandler(KeyboardFacade kf, UserFacade uf, RegexChecker rc, FormDoc fd) {
+        this.uf = uf;
         this.kf = kf;
-        this.ucs = ucs;
         this.rc = rc;
+        this.fd = fd;
     }
 
     @Override
-    public BotApiMethod<?> handle(Update update) {
+    public BotApiMethod<?> handle(Update update, CastingBot bot) throws TelegramApiException, IOException {
         if (update.hasMessage()){
         SendMessage s = new SendMessage();
         long userID=update.getMessage().getChatId();
         s.setChatId(userID);
-        switch (usr.checkStatus(userID))
+        if (uf.isAdmin(userID)){
+            String com = update.getMessage().getText().trim();
+            switch (com)
+            {
+                case "Посмотреть регистрации":
+                    StringBuffer t = new StringBuffer("Всего регистраций: ");
+                    t.append(uf.checkNotes()).append("\n").append("Из них сегодня: ").append(uf.checkTodayNotes());
+                    s.setText(t.toString());
+                    s.setReplyMarkup(kf.adminKeyboard());
+                    break;
+                case "Регистрации по отделам":
+                    Choice[] c = Choice.values();
+                    StringBuffer e = new StringBuffer("Распределение регистраций по направлениям:\n");
+                    for (Choice d:c)
+                    {
+                        e.append(d.getValue()).append(": ").append(uf.checkRegs(d));
+                    }
+                    s.setText(e.toString());
+                    s.setReplyMarkup(kf.adminKeyboard());
+                    break;
+                case "Выгрузить файл":
+                    SendDocument doc = new SendDocument();
+                    doc.setChatId(userID);
+                    doc.setDocument(new InputFile(fd.exportAllToExcel(),"Регистрации "+ LocalDate.now()));
+                    try {
+                        bot.execute(doc);
+                    } catch (TelegramApiException ex) {
+                        ex.printStackTrace();
+                    }
+                    s.setText("Актуальная информация по регистрациям");
+                    s.setReplyMarkup(kf.adminKeyboard());
+                    break;
+            }
+        }
+        else switch (uf.checkStatus(userID))
         {
             case CONTACT:
                 Contact contact = update.getMessage().getContact();
                 if (contact!=null){
                 String phone = contact.getPhoneNumber();
-                usr.addProperty(userID,"phone",phone);
-                usr.newState(userID, BotStatus.NAME);
+                uf.addProperty(userID,"phone",phone);
+                uf.newState(userID, BotStatus.NAME);
                 s.setText("Введите имя");}
                 else if (update.getMessage().hasText())
                 {
                     String phone = update.getMessage().getText();
                     if (rc.isPhone(phone))
                     {
-                        usr.addProperty(userID,"phone",phone);
-                        usr.newState(userID, BotStatus.NAME);
+                        uf.addProperty(userID,"phone",phone);
+                        uf.newState(userID, BotStatus.NAME);
                         s.setText("Введите имя");
                     }
                     else
@@ -64,28 +110,28 @@ public class MessageHandler implements Handler{
                 break;
             case NAME:
                 String name = update.getMessage().getText().trim();
-                usr.addProperty(userID,"name",name);
-                usr.newState(userID,BotStatus.SURNAME);
+                uf.addProperty(userID,"name",name);
+                uf.newState(userID,BotStatus.SURNAME);
                 s.setText("Введите фамилию");
                 break;
             case SURNAME:
                 String surname = update.getMessage().getText().trim();
-                usr.addProperty(userID,"surname",surname);
-                usr.newState(userID,BotStatus.COURSE);
+                uf.addProperty(userID,"surname",surname);
+                uf.newState(userID,BotStatus.COURSE);
                 s.setText("На каком курсе Вы учитесь?");
                 break;
             case COURSE:
                 String course = update.getMessage().getText().trim();
-                usr.addProperty(userID,"course",course);
-                usr.newState(userID,BotStatus.AGE);
+                uf.addProperty(userID,"course",course);
+                uf.newState(userID,BotStatus.AGE);
                 s.setText("Сколько Вам лет?");
                 break;
             case AGE:
                 String age = update.getMessage().getText().trim();
                 if (rc.isAge(age))
                 {
-                    usr.addProperty(userID,"age",age);
-                    usr.newState(userID,BotStatus.FACULTY);
+                    uf.addProperty(userID,"age",age);
+                    uf.newState(userID,BotStatus.FACULTY);
                     s.setText("Выберите факультет");
                     s.setReplyMarkup(kf.facultiesKeyboard());
                 }
@@ -105,8 +151,8 @@ public class MessageHandler implements Handler{
                 }
                 else
                 {
-                    usr.addProperty(userID, "eventmaking", skills_event);
-                    usr.newState(userID,BotStatus.EVENTPART);
+                    uf.addProperty(userID, "eventmaking", skills_event);
+                    uf.newState(userID,BotStatus.EVENTPART);
                     s.setText("Был ли у вас опыт участия в мероприятиях?");
                 }
                 break;
@@ -118,11 +164,15 @@ public class MessageHandler implements Handler{
                 }
                 else
                 {
-                    usr.addProperty(userID,"eventpart",participation);
-                    usr.newState(userID,BotStatus.READY);
-                    ucs.saveUserCard(userID);
-                    s.setText("Вы зарегистрированы на кастинг!\nГлавное меню");
+                    uf.addProperty(userID,"eventpart",participation);
+                    uf.newState(userID,BotStatus.READY);
+                    uf.saveUserCard(userID);
+                    s.setText("Вы зарегистрированы на кастинг! В подарок - стикеры ССК!\nГлавное меню");
                     s.setReplyMarkup(kf.menuKeyboard());
+                    SendSticker sticker = new SendSticker();
+                    sticker.setChatId(userID);
+                    sticker.setSticker(new InputFile("CAACAgIAAxkBAAECeVdozEzw8VM5EvGhdBM0adQ6LbK8TwAC7oYAAuQ1WUpEcJncEHBAdzYE"));
+                    bot.execute(sticker);
                 }
                 break;
             case READY:

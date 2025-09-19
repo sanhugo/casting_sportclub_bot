@@ -37,4 +37,7 @@ public class KeyboardFacade {
     {
         return keyboardMaker.menuButton();
     }
+    public ReplyKeyboardMarkup adminKeyboard() {
+        return keyboardMaker.adminKeyboard();
+    }
 }

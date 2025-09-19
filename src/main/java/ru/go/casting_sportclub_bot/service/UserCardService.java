@@ -30,6 +30,11 @@ public class UserCardService {
         return redisTemplate.hasKey(key) || userCardRepository.existsByTgid(id);
     }
 
+    public void addProperty(long userID, String field, String f) {
+        String key = "UserCards:"+userID;
+        redisTemplate.opsForHash().put(key,field,f);
+    }
+
     @Async
     public void saveUserCard(long id)    {
         String key = "UserCards:"+id;
@@ -55,5 +60,17 @@ public class UserCardService {
         userCardRepository.save(u);
         redisTemplate.delete(key);
         redisTemplate.delete(key2);
+    }
+
+    public long checkRegs(Choice choice) {
+        return userCardRepository.countByChoice(choice);
+    }
+
+    public long countRegs() {
+        return userCardRepository.count();
+    }
+
+    public long countTodayRegs() {
+        return userCardRepository.countByRegdate(LocalDate.now());
     }
 }

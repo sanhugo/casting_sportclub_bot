@@ -15,6 +15,7 @@ import ru.go.casting_sportclub_bot.keyboard.KeyboardFacade;
 import ru.go.casting_sportclub_bot.model.BotStatus;
 import ru.go.casting_sportclub_bot.model.Choice;
 import ru.go.casting_sportclub_bot.service.DirectionService;
+import ru.go.casting_sportclub_bot.service.UserFacade;
 import ru.go.casting_sportclub_bot.service.UserStateService;
 
 import java.util.HashSet;
@@ -23,21 +24,21 @@ import java.util.stream.Collectors;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class CallbackHandler {
-    UserStateService ust;
+public class CallbackHandler implements Handler{
+    UserFacade uf;
     KeyboardFacade kf;
     DirectionService ds;
 
-    public CallbackHandler(UserStateService ust, KeyboardFacade kf, DirectionService ds) {
-        this.ust = ust;
+    public CallbackHandler(UserFacade uf, KeyboardFacade kf, DirectionService ds) {
+        this.uf = uf;
         this.kf = kf;
         this.ds = ds;
     }
-
+    @Override
     public BotApiMethod<?> handle(Update update, CastingBot bot) {
         long userID = update.getCallbackQuery().getMessage().getChatId();
         int messageId = update.getCallbackQuery().getMessage().getMessageId();
-        BotStatus bt = ust.checkStatus(userID);
+        BotStatus bt = uf.checkStatus(userID);
 
         switch (bt) {
             case FACULTY:
@@ -51,8 +52,8 @@ public class CallbackHandler {
                     e.printStackTrace();
                 }
 
-                ust.newState(userID, BotStatus.CHOICES);
-                ust.addProperty(userID, "faculties", f);
+                uf.newState(userID, BotStatus.CHOICES);
+                uf.addProperty(userID, "faculties", f);
 
                 SendMessage s = new SendMessage();
                 s.setChatId(userID);
@@ -73,7 +74,7 @@ public class CallbackHandler {
                     edit.setMessageId(messageId);
                     edit.setText("Опишите свой опыт организации мероприятий.");
                     edit.setReplyMarkup(null);
-                    ust.newState(userID,BotStatus.EVENTMAKING);
+                    uf.newState(userID,BotStatus.EVENTMAKING);
                     return edit;
 
                 } else {

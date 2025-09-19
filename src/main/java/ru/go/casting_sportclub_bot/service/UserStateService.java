@@ -34,8 +34,4 @@ public class UserStateService {
             return BotStatus.CONTACT;
     }
 
-    public void addProperty(long userID, String field, String f) {
-        String key = "UserCards:"+userID;
-        redisTemplate.opsForHash().put(key,field,f);
-    }
 }
